@@ -121,7 +121,7 @@ export default function BuyForm({ ethBalance, tokenBalance, buyTokens }) {
           borderRadius: 8,
         }}
       >
-        Swap
+        SWAP!
       </button>
     </div>
   );

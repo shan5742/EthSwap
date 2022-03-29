@@ -122,7 +122,7 @@ export default function SellForm({ ethBalance, tokenBalance, sellTokens }) {
           borderRadius: 8,
         }}
       >
-        Swap
+        SWAP!
       </button>
     </div>
   );
