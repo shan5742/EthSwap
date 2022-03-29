@@ -1,51 +1,101 @@
-import React, { Component } from 'react';
-import logo from '../logo.png';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import Web3 from "web3";
+// Import smart contract ABIs
+import EthSwap from "../abis/EthSwap.json";
+import Token from "../abis/Token.json";
+import Main from "./Main";
+// Import components
+import Nav from "./Nav";
 
-class App extends Component {
-  render() {
-    return (
+export default function App() {
+  const [account, setAccount] = useState("");
+  const [tokenContract, setTokenContract] = useState({});
+  const [ethSwapContract, setEthSwapContract] = useState({});
+  const [ethBalance, setEthBalance] = useState(0);
+  const [tokenBalance, setTokenBalance] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadWeb3();
+    loadBlockChainData();
+    console.log("WEB3", window.web3);
+  }, []);
+
+  // Load web3
+  const loadWeb3 = async () => {
+    if (window.ethereum) {
+      window.web3 = new Web3(window.ethereum);
+      await window.ethereum.enable();
+    } else if (window.web3) {
+      window.web3 = new Web3(window.web3.currentProvider);
+    } else {
+      window.alert(
+        "Non-Ethereum browser detected. You should consider trying MetaMask!"
+      );
+    }
+  };
+
+  // Grab data from blockchain
+  const loadBlockChainData = async () => {
+    const web3 = window.web3;
+    const accounts = await web3.eth.getAccounts();
+    const ethBalanceData = await web3.eth.getBalance(accounts[0]);
+    setEthBalance(ethBalanceData);
+    setAccount(accounts[0]);
+
+    // Load token
+    const networkId = await web3.eth.net.getId();
+    const tokenData = Token.networks[networkId];
+    if (tokenData) {
+      const token = new web3.eth.Contract(Token.abi, tokenData.address);
+      setTokenContract(token);
+      let tokenBalanceData = await token.methods.balanceOf(accounts[0]).call();
+      console.log("Balance", tokenBalanceData.toString());
+      setTokenBalance(tokenBalanceData.toString());
+    } else {
+      window.alert("Token contract not deployed to connected network");
+    }
+
+    // Load EthSwap
+    const ethSwapData = EthSwap.networks[networkId];
+    if (ethSwapData) {
+      const ethSwap = new web3.eth.Contract(EthSwap.abi, ethSwapData.address);
+      setEthSwapContract(ethSwap);
+    } else {
+      window.alert("EthSwap contract not deployed to connected network");
+    }
+
+    setLoading(false);
+  };
+
+  const buyTokens = (etherAmount) => {
+    setLoading(true);
+    ethSwapContract.methods
+      .buyTokens()
+      .send({ value: etherAmount, from: account })
+      .on("transactionHash", (hash) => {
+        setLoading(false);
+      });
+  };
+
+  if (loading) return <div>Loading...</div>;
+
+  return (
+    <div>
+      <Nav account={account} />
       <div>
-        <nav className="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-          <a
-            className="navbar-brand col-sm-3 col-md-2 mr-0"
-            href="http://www.dappuniversity.com/bootcamp"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Dapp University
-          </a>
-        </nav>
-        <div className="container-fluid mt-5">
-          <div className="row">
-            <main role="main" className="col-lg-12 d-flex text-center">
-              <div className="content mr-auto ml-auto">
-                <a
-                  href="http://www.dappuniversity.com/bootcamp"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <img src={logo} className="App-logo" alt="logo" />
-                </a>
-                <h1>Dapp University Starter Kit</h1>
-                <p>
-                  Edit <code>src/components/App.js</code> and save to reload.
-                </p>
-                <a
-                  className="App-link"
-                  href="http://www.dappuniversity.com/bootcamp"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  LEARN BLOCKCHAIN <u><b>NOW! </b></u>
-                </a>
-              </div>
-            </main>
-          </div>
+        <div>
+          <main role="main">
+            <div>
+              <Main
+                ethBalance={ethBalance}
+                tokenBalance={tokenBalance}
+                buyTokens={buyTokens}
+              />
+            </div>
+          </main>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
-
-export default App;
