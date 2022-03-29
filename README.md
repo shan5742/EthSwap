@@ -1,3 +1,12 @@
 # EthSwap
 
-Simple project for learning and working with Solidity and Smart Contracts on the Ethereum Blockchain. Got exposure to various test natworks, faucets, web3.js, payable functions and much more.
+Simple project for leaarning Solidity and Smart Contracts. Topics covered include:
+
+- Creating ERC20 token
+- Payable funcitons
+- Buying tokens
+- Selling tokens
+- Testing all Solidity code
+- Truffle & Ganache
+- Using web3.js to hook up the React frontend
+
