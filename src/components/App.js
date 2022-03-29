@@ -18,7 +18,6 @@ export default function App() {
   useEffect(() => {
     loadWeb3();
     loadBlockChainData();
-    console.log("WEB3", window.web3);
   }, []);
 
   // Load web3
@@ -50,7 +49,6 @@ export default function App() {
       const token = new web3.eth.Contract(Token.abi, tokenData.address);
       setTokenContract(token);
       let tokenBalanceData = await token.methods.balanceOf(accounts[0]).call();
-      console.log("Balance", tokenBalanceData.toString());
       setTokenBalance(tokenBalanceData.toString());
     } else {
       window.alert("Token contract not deployed to connected network");
