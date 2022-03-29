@@ -3,7 +3,12 @@ import BuyForm from "./BuyForm";
 import FormSwitcher from "./FormSwitcher";
 import SellForm from "./SellForm";
 
-export default function Main({ tokenBalance, ethBalance, buyTokens }) {
+export default function Main({
+  tokenBalance,
+  ethBalance,
+  buyTokens,
+  sellTokens,
+}) {
   const [currentForm, setCurrentForm] = useState("buy");
   return (
     <div
@@ -30,7 +35,7 @@ export default function Main({ tokenBalance, ethBalance, buyTokens }) {
         <SellForm
           tokenBalance={tokenBalance}
           ethBalance={ethBalance}
-          buyTokens={buyTokens}
+          sellTokens={sellTokens}
         />
       )}
     </div>

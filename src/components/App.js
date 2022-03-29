@@ -78,6 +78,21 @@ export default function App() {
       });
   };
 
+  const sellTokens = (tokenAmount) => {
+    setLoading(true);
+    tokenContract.methods
+      .approve(ethSwapContract.address, tokenAmount)
+      .send({ from: account })
+      .on("transactionHash", (hash) => {
+        ethSwapContract.methods
+          .sellTokens(tokenAmount)
+          .send({ from: account })
+          .on("transactionHash", (hash) => {
+            setLoading(false);
+          });
+      });
+  };
+
   if (loading) return <div>Loading...</div>;
 
   return (
@@ -91,6 +106,7 @@ export default function App() {
                 ethBalance={ethBalance}
                 tokenBalance={tokenBalance}
                 buyTokens={buyTokens}
+                sellTokens={sellTokens}
               />
             </div>
           </main>
